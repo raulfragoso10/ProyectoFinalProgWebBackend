@@ -47,7 +47,7 @@ function eliminarCategoria(req, res) {
             } else {
                 let mensaje = "";
                 if(data.affectedRows === 0) {
-                    mensaje = "Los campos son los mismos";
+                    mensaje = "Categoria no encontrada";
                 } else {
                     mensaje = "Categoria eliminada con éxito";
                 }
@@ -83,10 +83,6 @@ function crearPersonal(req, res){
 
         if(!personal.apellidos){
             return res.status(400).send({error: true, mensaje: "Los apellidos del personal son obligatorios"});
-        }
-
-        if(personal.telefono.length < 10){
-            return res.status(400).send({error: true, mensaje: "El telefono debe tener 10 dígitos"});
         }
 
         let sql = "INSERT INTO personal set ?";
@@ -146,6 +142,27 @@ function editarPersonal(req, res) {
         } )
 
 
+    }
+}
+
+function eliminarPersonal(req, res) {
+    if(connection) {
+        const { id } = req.params;
+        let sql = "DELETE FROM personal WHERE id = ?";
+        connection.query(sql, [id], (err, data) => {
+            if(err) {
+                res.json(err);
+            } else {
+                let mensaje = "";
+                if(data.affectedRows === 0) {
+                    mensaje = "Personal no encontrado";
+                } else {
+                    mensaje = "Personal eliminado con éxito";
+                }
+
+                res.json({error: false, data, mensaje});
+            }
+        })
     }
 }
 
@@ -278,6 +295,7 @@ module.exports = {
     crearPersonal,
     obtenerPersonal,
     editarPersonal,
+    eliminarPersonal,
     listarTickets,
     crearTicket,
     obtenerTicket,

@@ -2,8 +2,8 @@ const express = require('express');
 
 const routes = express.Router();
 
-const {listarCategoria, crearCategoria, eliminarCategoria, listarPersonal, crearPersonal, obtenerPersonal, editarPersonal
-, listarTickets, crearTicket, obtenerTicket, editarTicket, estatusTicket} = require ('../Controllers/proyectoController');
+const {listarCategoria, crearCategoria, eliminarCategoria, listarPersonal, crearPersonal, obtenerPersonal, editarPersonal, 
+    eliminarPersonal, listarTickets, crearTicket, obtenerTicket, editarTicket, estatusTicket} = require ('../Controllers/proyectoController');
 
 routes.get('/', listarCategoria);
 
@@ -11,22 +11,24 @@ routes.post('/', crearCategoria);
 
 routes.delete('/:id', eliminarCategoria); 
 
-routes.get('/', listarPersonal);
+routes.get('/personal', listarPersonal);
 
-routes.post('/', crearPersonal);
+routes.post('/personal', crearPersonal);
 
-routes.get('/:id', obtenerPersonal); 
+routes.get('/personal/:id', obtenerPersonal); 
 
-routes.put('/:id', editarPersonal)
+routes.put('/personal/:id', editarPersonal);
 
-routes.get('/', listarTickets);
+routes.delete('/personal/:id', eliminarPersonal);
 
-routes.post('/', crearTicket);
+routes.get('/ticket', listarTickets);
 
-routes.get('/:id', obtenerTicket); 
+routes.post('/ticket', crearTicket);
 
-routes.put('/:id', editarTicket)
+routes.get('/ticket/:id', obtenerTicket); 
 
-routes.put('/:id', estatusTicket)
+routes.put('/ticket/:id', editarTicket)
+
+routes.put('/ticket/:id', estatusTicket)
 
 module.exports = routes;
