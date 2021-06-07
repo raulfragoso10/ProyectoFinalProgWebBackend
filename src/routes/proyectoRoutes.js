@@ -2,12 +2,31 @@ const express = require('express');
 
 const routes = express.Router();
 
-const {listar,/*obtenerDato,crear,editar,eliminar*/} = require ('../Controllers/proyectoController');
+const {listarCategoria, crearCategoria, eliminarCategoria, listarPersonal, crearPersonal, obtenerPersonal, editarPersonal
+, listarTickets, crearTicket, obtenerTicket, editarTicket, estatusTicket} = require ('../Controllers/proyectoController');
 
-routes.get('/', listar);
+routes.get('/', listarCategoria);
 
-/*routes.get('/:id', obtenerDato); 
+routes.post('/', crearCategoria);
 
-routes.post('/', crear);*/
+routes.delete('/:id', eliminarCategoria); 
+
+routes.get('/', listarPersonal);
+
+routes.post('/', crearPersonal);
+
+routes.get('/:id', obtenerPersonal); 
+
+routes.put('/:id', editarPersonal)
+
+routes.get('/', listarTickets);
+
+routes.post('/', crearTicket);
+
+routes.get('/:id', obtenerTicket); 
+
+routes.put('/:id', editarTicket)
+
+routes.put('/:id', estatusTicket)
 
 module.exports = routes;

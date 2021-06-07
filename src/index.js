@@ -1,5 +1,5 @@
 const express= require('express');
-// const cors = require ('cors') para despues
+const cors = require ('cors')
 
 
 //Inicializando
@@ -9,9 +9,9 @@ const app = express();
 app.set('port',process.env.PORT || 3000);
 
 //middleware
-// app.use(express.urlencoded({extended: false}));
-// app.use(express.json());
-// app.use(cors()); para despues
+app.use(express.urlencoded({extended: false}));
+app.use(express.json());
+app.use(cors());
 
 //base de datos
 require('./config/connection');
