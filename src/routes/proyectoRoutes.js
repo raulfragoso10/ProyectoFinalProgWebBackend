@@ -2,10 +2,16 @@ const express = require('express');
 
 const routes = express.Router();
 
-const {listarCategoria, crearCategoria, eliminarCategoria, listarPersonal, crearPersonal, obtenerPersonal, editarPersonal, 
-    eliminarPersonal, listarTickets, crearTicket, obtenerTicket, editarTicket, estatusTicket} = require ('../Controllers/proyectoController');
+const {listarCategoria, selectCategoria, crearCategoria, personalConcatenado, eliminarCategoria, listarPersonal, crearPersonal, obtenerPersonal, editarPersonal, 
+    eliminarPersonal, listarTickets, ticketFiltro, crearTicket, obtenerTicket, editarTicket,eliminarTicket, cambiarEstatus} = require ('../Controllers/proyectoController');
 
 routes.get('/', listarCategoria);
+
+routes.get('/ticketFiltro/:id', ticketFiltro); 
+
+routes.get('/selectCategoria', selectCategoria);
+
+routes.get('/personalConcatenado', personalConcatenado);
 
 routes.post('/', crearCategoria);
 
@@ -29,6 +35,8 @@ routes.get('/ticket/:id', obtenerTicket);
 
 routes.put('/ticket/:id', editarTicket)
 
-routes.put('/ticket/:id', estatusTicket)
+routes.delete('/ticket/:id', eliminarTicket);
+
+routes.put('/cambiarEstatus/:id', cambiarEstatus)
 
 module.exports = routes;

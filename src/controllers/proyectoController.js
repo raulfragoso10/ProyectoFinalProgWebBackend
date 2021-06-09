@@ -15,6 +15,20 @@ function listarCategoria(req, res) {
     }
 }
 
+function selectCategoria(req, res) {
+    if(connection) {
+        let sql = "SELECT id as value, nombre as text FROM categoria";
+        connection.query(sql, (err,contenido) => {
+            if(err) {
+                res.json(err);
+            } else {
+                console.log(contenido);
+                res.json(contenido);
+            }
+        });
+    }
+}
+
 function crearCategoria(req, res){
     if(connection){
         console.log(req.body);
@@ -43,7 +57,7 @@ function eliminarCategoria(req, res) {
         let sql = "DELETE FROM categoria WHERE id = ?";
         connection.query(sql, [id], (err, data) => {
             if(err) {
-                res.json(err);
+                return res.status(400).send({error: true, mensaje: "No se puede eliminar por llave foranea"});
             } else {
                 let mensaje = "";
                 if(data.affectedRows === 0) {
@@ -151,7 +165,7 @@ function eliminarPersonal(req, res) {
         let sql = "DELETE FROM personal WHERE id = ?";
         connection.query(sql, [id], (err, data) => {
             if(err) {
-                res.json(err);
+                return res.status(400).send({error: true, mensaje: "No se puede eliminar por llave foranea"});
             } else {
                 let mensaje = "";
                 if(data.affectedRows === 0) {
@@ -166,9 +180,23 @@ function eliminarPersonal(req, res) {
     }
 }
 
+/*function listarTickets(req, res) {
+    if(connection) {
+        let sql = "select id, nombre, descripcion, prioridad, personal, categoria, case when estatus = 'ABT' then 'Abierto' when estatus = 'ESP' then 'En espera' when estatus = 'FIN' then 'Finalizado' end as estatus from tickets";
+        connection.query(sql, (err,contenido) => {
+            if(err) {
+                res.json(err);
+            } else {
+                console.log(contenido);
+                res.json(contenido);
+            }
+        });
+    }
+}*/
+
 function listarTickets(req, res) {
     if(connection) {
-        let sql = "SELECT * FROM tickets";
+        let sql = "select t.id, t.nombre, t.descripcion, case when t.prioridad = '1' then 'Alta' when t.prioridad = '2' then 'Media' when t.prioridad = '3' then 'Alta' end as prioridad, CONCAT(p.nombre, ' ', p.apellidos) As personal , c.nombre as categoria, case when t.estatus = 'ABT' then 'Abierto' when t.estatus = 'ESP' then 'En espera' when t.estatus = 'FIN' then 'Finalizado' end as estatus  from tickets t inner join personal p on t.personal = p.id inner join categoria c on t.categoria = c.id";
         connection.query(sql, (err,contenido) => {
             if(err) {
                 res.json(err);
@@ -179,6 +207,7 @@ function listarTickets(req, res) {
         });
     }
 }
+
 
 function crearTicket(req, res){
     if(connection){
@@ -201,7 +230,7 @@ function crearTicket(req, res){
             return res.status(400).send({error: true, mensaje: "La categoria del ticket es obligatoria"});
         }
 
-        let sql = "INSERT INTO ticket set ?";
+        let sql = "INSERT INTO tickets set ?";
 
         connection.query(sql, [ticket], (err, data) => {
             if(err){
@@ -224,7 +253,7 @@ function obtenerTicket(req, res) {
             } else {
                 var mensaje1 = "";
                 if(ticket === undefined || ticket.length == 0)
-                mensaje1 = "ticket no encontrado";
+                mensaje1 = "Ticket no encontrado";
 
                 res.json({data: ticket[0], mensaje: mensaje1});
             }
@@ -233,9 +262,28 @@ function obtenerTicket(req, res) {
 
 }
 
+function ticketFiltro(req, res) {
+    if(connection){
+        const { id } = req.params; 
+        let sql = `select t.id, t.nombre, t.descripcion, case when t.prioridad = '1' then 'Alta' when t.prioridad = '2' then 'Media' when t.prioridad = '3' then 'Alta' end as prioridad, CONCAT(p.nombre, ' ', p.apellidos) As personal , c.nombre as categoria, case when t.estatus = 'ABT' then 'Abierto' when t.estatus = 'ESP' then 'En espera' when t.estatus = 'FIN' then 'Finalizado' end as estatus  from tickets t inner join personal p on t.personal = p.id inner join categoria c on t.categoria = c.id where t.categoria = ${connection.escape(id)}` ;
+        connection.query(sql, (err,contenido) => {
+            if(err) {
+                res.json(err);
+                console.log(err)
+            } else {
+                if(contenido.length < 1){
+                    return res.status(400).send({error: true, mensaje: "No se encontro ninguno"});                    
+                }
+                console.log(contenido);
+                res.json(contenido);
+            }
+        });
+    }
 
+}
 
 function editarTicket(req, res) {
+    console.log(req.body)
     if(connection){
         const { id } = req.params;
         const ticket = req.body;
@@ -261,36 +309,70 @@ function editarTicket(req, res) {
     }
 }
 
-function estatusTicket(req, res) {
+function eliminarTicket(req, res) {
+    if(connection) {
+        const { id } = req.params;
+        let sql = "DELETE FROM tickets WHERE id = ?";
+        connection.query(sql, [id], (err, data) => {
+            if(err) {
+                res.json(err);
+            } else {
+                let mensaje = "";
+                if(data.affectedRows === 0) {
+                    mensaje = "Ticket no encontrado";
+                } else {
+                    mensaje = "Ticket eliminado con éxito";
+                }
+
+                res.json({error: false, data, mensaje});
+            }
+        })
+    }
+}
+
+function personalConcatenado(req, res) {
+    if(connection) {
+        let sql = "SELECT id as value, CONCAT(nombre, ' ', apellidos) As text from personal;";
+        connection.query(sql, (err,contenido) => {
+            if(err) {
+                res.json(err);
+            } else {
+                console.log(contenido);
+                res.json(contenido);
+            }
+        });
+    }
+}
+
+function cambiarEstatus(req, res) {
+    console.log(req.body)
     if(connection){
         const { id } = req.params;
-        const ticket = req.body;
 
-        let sql = "UPDATE tickets set ? WHERE id = ?";
+        let sql = "UPDATE tickets set estatus = ? WHERE id = ?";
 
-        connection.query(sql, [ticket, id], (err, data) => {
+        connection.query(sql, [req.body.estatus, id], (err, data) => {
             if(err) {
                 res.json(err);
             } else {
                 let mensaje = "";
                 if(data.changedRows === 0) {
-                    mensaje = "El estatus es el misma"
+                    mensaje = "El estatus es el mismo"
                 } else {
-                    mensaje = "Estatus actualizado con exito."
+                    mensaje = "Estatus actualizado con exito"
                 }
-
                 res.json({error: false, data, mensaje});
             }
         } )
-
-
     }
 }
 
 module.exports = {
     listarCategoria,
+    selectCategoria,
     crearCategoria,
     eliminarCategoria,
+    personalConcatenado,
     listarPersonal,
     crearPersonal,
     obtenerPersonal,
@@ -300,5 +382,7 @@ module.exports = {
     crearTicket,
     obtenerTicket,
     editarTicket,
-    estatusTicket
+    eliminarTicket,
+    ticketFiltro,
+    cambiarEstatus
 }
